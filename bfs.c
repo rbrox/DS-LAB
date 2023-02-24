@@ -1,114 +1,78 @@
-// Linkers
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
-// Global
+#define MAX_SIZE 100
 
-#define VERTEX 2
+// Depth-First Search (DFS) function
+void DFS(int graph[][MAX_SIZE], bool visited[], int vertex, int numVertices) {
+    int i;
+    visited[vertex] = true;
+    printf("%d ", vertex);
 
-int graph[VERTEX][VERTEX];
-int stack[VERTEX];
-int order[VERTEX];
-
-// Prototypes
-void bredth_first_traverse();
-
-void graph_read()
-{
-    // Empty the graph
-    for (int i = 0; i < VERTEX; ++i)
-    {
-        for (int j = 0; j < VERTEX; j++)
-        {
-            graph[i][j] = 0;
+    for (i = 0; i < numVertices; i++) {
+        if (graph[vertex][i] && !visited[i]) {
+            DFS(graph, visited, i, numVertices);
         }
-    
     }
-
-    // Enter connections
-    for (int i = 0; i < VERTEX; ++i)
-    {
-        for (int j = 0; j < VERTEX; j++)
-        {
-            int boolean;
-            printf("Enter whether %d & %d are connected: ", i + 1, j + 1 );
-            scanf("%d", &boolean);
-
-            if (boolean == 0)
-            {
-                graph[i][j] = 0;
-            }
-            else{
-                graph[i][j] = 1;
-            }
-        }
-    
-    }
-
 }
 
-// Main
-void main()
-{
-    graph_read();
-    bredth_first_traverse();
+// Breadth-First Search (BFS) function
+void BFS(int graph[][MAX_SIZE], bool visited[], int vertex, int numVertices) {
+    int queue[MAX_SIZE], front = 0, rear = 0, i;
+    visited[vertex] = true;
+    printf("%d ", vertex);
+    queue[rear++] = vertex;
 
-    for (int i = 0; i < VERTEX; i++)
-    {
-        printf("%d\t", order[i]);
-    }
-   
-    
-}
-
-
-// Declarations
-
-void bredth_first_traverse()
-{   
-    // Pointers to keep track of the stack position 
-    // and the graph position and the vertex visit count respectively
-    int stack_ptr = -1;
-    int graph_ptr = 0;
-    int visit_rem = VERTEX;
-    int visit_ptr = 0;
-    // array keeping track of visited vertices
-    int traversed[VERTEX];
-    for (int i = 0; i < VERTEX; i++, traversed[i] = 0);
-    // Going to the first vertice & updating traversed array
-    stack[++stack_ptr] = graph_ptr;
-    traversed[graph_ptr] = 1;
-    order[visit_ptr] = graph_ptr;
-
-    // Now while any adjascent vertices arent visited , visit them
-
-    while(visit_rem)
-    {
-        // A switch variable which checks whether this pass found a new vertex
-        int swt = 0;
-        for(int i = 0; i < VERTEX; ++i)
-        {
-            // Cheking for a vertex which is connected to the graph_ptr and hasnt been visited
-            if(graph[graph_ptr][i] == 1 && traversed[i] == 0)
-            {
-                // New vertex is added to stack, graph_ptr updated, visit_rem decreased
-                graph_ptr = i;
-                stack[++stack_ptr] = graph_ptr;
-                traversed[graph_ptr] = 1;
-                order[++visit_ptr] = graph_ptr;
-                -- visit_rem;
-                // We have reached a new vertex hence break out
-                swt = 1;
-                break;
+    while (front < rear) {
+        int current = queue[front++];
+        for (i = 0; i < numVertices; i++) {
+            if (graph[current][i] && !visited[i]) {
+                visited[i] = true;
+                printf("%d ", i);
+                queue[rear++] = i;
             }
         }
+    }
+}
 
-        // pass didnt find new vertex, all adjascent vertices are travelled too
-        if(!swt)
-        {
-            // pop ele from stack, go back to last element
-            graph_ptr = stack[--stack_ptr];
+// Main function
+int main() {
+    int numVertices, i, j;
+    int graph[MAX_SIZE][MAX_SIZE];
+    bool visited[MAX_SIZE];
+
+    // Read number of vertices
+    printf("Enter the number of vertices: ");
+    scanf("%d", &numVertices);
+
+    // Read adjacency matrix
+    printf("Enter the adjacency matrix:\n");
+    for (i = 0; i < numVertices; i++) {
+        for (j = 0; j < numVertices; j++) {
+            scanf("%d", &graph[i][j]);
         }
     }
 
+    // Initialize visited array to false
+    for (i = 0; i < numVertices; i++) {
+        visited[i] = false;
+    }
+
+    // Run DFS on the graph
+    printf("DFS: ");
+    DFS(graph, visited, 0, numVertices);
+    printf("\n");
+
+    // Reset visited array to false
+    for (i = 0; i < numVertices; i++) {
+        visited[i] = false;
+    }
+
+    // Run BFS on the graph
+    printf("BFS: ");
+    BFS(graph, visited, 0, numVertices);
+    printf("\n");
+
+    return 0;
 }
